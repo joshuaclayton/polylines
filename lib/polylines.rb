@@ -1,3 +1,4 @@
 module Polylines
-  # Your code goes here...
+  autoload :Encoder, "polylines/encoder"
+  autoload :Decoder, "polylines/decoder"
 end
