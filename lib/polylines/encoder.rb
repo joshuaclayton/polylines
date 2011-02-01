@@ -1,5 +1,5 @@
 module Polylines
-  class Encoder
+  class Encoder < Base
     def self.encode_points(points)
       delta_latitude, delta_longitude = 0, 0
 
@@ -40,10 +40,6 @@ module Polylines
       number << 1
     end
 
-    def self.step_5(number)
-      ~number
-    end
-
     def self.step_6(number)
       [].tap do |numbers|
         while number > 0 do
@@ -51,10 +47,6 @@ module Polylines
           number = number >> 5
         end
       end
-    end
-
-    def self.step_7(five_bit_chunks)
-      five_bit_chunks.reverse
     end
 
     def self.step_8(five_bit_chunks)

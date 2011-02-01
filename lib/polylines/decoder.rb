@@ -1,5 +1,5 @@
 module Polylines
-  class Decoder
+  class Decoder < Base
     def self.decode_polyline(polyline)
       set = []
 
@@ -12,7 +12,7 @@ module Polylines
         end
 
         charset
-      end.map {|set| decode(set) }
+      end.map {|charset| decode(charset) }
 
       points = [[points_with_deltas.shift, points_with_deltas.shift]]
 
@@ -55,18 +55,10 @@ module Polylines
       number >> 1
     end
 
-    def self.step_5(number)
-      ~number
-    end
-
     def self.step_6(five_bit_chunks)
       five_bit_chunks.map do |chunk|
         "%05b" % chunk
       end.join
-    end
-
-    def self.step_7(five_bit_chunks)
-      five_bit_chunks.reverse
     end
 
     def self.step_8(decimal_values)
