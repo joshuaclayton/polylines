@@ -1,11 +1,117 @@
 module Polylines
   class Base
-    def self.step_5(number)
-      ~number
+    attr_reader :current_value, :negative
+
+    def initialize(current_value)
+      @current_value = current_value
     end
 
-    def self.step_7(five_bit_chunks)
-      five_bit_chunks.reverse
+    def step_2
+      @negative = current_value < 0 if encoding?
+
+      encode! { (current_value * 1e5).round }
+      decode! { current_value.to_f/1e5 }
+    end
+
+    def step_3
+      return unless negative
+      encode! { ~(current_value * -1) + 1 }
+      decode! { ~(current_value - 1) * -1 }
+    end
+
+    def step_4
+      encode! { current_value << 1 }
+      decode! { current_value >> 1 }
+    end
+
+    def step_5
+      return unless negative
+      encode! { ~current_value }
+      decode! { ~current_value }
+    end
+
+    def step_6
+      encode! do
+        [].tap do |numbers|
+          while current_value > 0 do
+            numbers.unshift(current_value & 0x1f)
+            @current_value >>= 5
+          end
+        end
+      end
+
+      decode! do
+        current_value.map {|chunk| "%05b" % chunk }.join.tap do |val|
+          @negative = val[-1, 1] == "1"
+        end.to_i(2)
+      end
+    end
+
+    def step_7
+      encode! { current_value.reverse }
+      decode! { current_value.reverse }
+    end
+
+    def step_8
+      encode! { current_value[0..-2].map {|item| item | 0x20 } << current_value.last }
+      decode! { current_value[0..-2].map {|item| item ^ 0x20 } << current_value.last }
+    end
+
+    def step_10
+      encode! { current_value.map {|value| value + 63 } }
+      decode! { current_value.map {|value| value - 63 } }
+    end
+
+    def step_11
+      encode! { current_value.map(&:chr).join }
+      decode! { current_value.split(//).map {|char| char[0] } }
+    end
+
+    def encode!
+      if encoding?
+        @current_value = yield
+      end
+    end
+
+    def decode!
+      if decoding?
+        @current_value = yield
+      end
+    end
+
+    def encoding?
+      self.is_a?(Polylines::Encoder)
+    end
+
+    def decoding?
+      self.is_a?(Polylines::Decoder)
+    end
+
+    def self.transform_to_array_of_lat_lng_and_deltas(value)
+      if self == Polylines::Encoder
+        delta_latitude, delta_longitude = 0, 0
+
+        return value.inject([]) do |polyline, (latitude, longitude)|
+          polyline << latitude - delta_latitude
+          polyline << longitude - delta_longitude
+          delta_latitude, delta_longitude = latitude, longitude
+          polyline
+        end
+      end
+
+      if self == Polylines::Decoder
+        set = []
+        return value.split(//).inject([]) do |charset, char|
+          set << char
+
+          if ((char[0] - 63) & 0x20) == 0
+            charset << set.join
+            set = []
+          end
+
+          charset
+        end.map {|charset| decode(charset) }
+      end
     end
   end
 end
