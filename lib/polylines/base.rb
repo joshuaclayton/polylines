@@ -64,7 +64,7 @@ module Polylines
 
     def step_11
       encode! { current_value.map(&:chr).join }
-      decode! { current_value.split(//).map {|char| char[0] } }
+      decode! { current_value.split(//).map {|char| char.unpack("U").first } }
     end
 
     def encode!
@@ -104,7 +104,7 @@ module Polylines
         return value.split(//).inject([]) do |charset, char|
           set << char
 
-          if ((char[0] - 63) & 0x20) == 0
+          if ((char.unpack("U").first - 63) & 0x20).zero?
             charset << set.join
             set = []
           end
