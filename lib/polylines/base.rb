@@ -37,6 +37,8 @@ module Polylines
             numbers.unshift(current_value & 0x1f)
             @current_value >>= 5
           end
+
+          numbers << 0 if numbers.empty?
         end
       end
 

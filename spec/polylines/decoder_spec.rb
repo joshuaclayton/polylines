@@ -14,3 +14,9 @@ describe Polylines::Decoder, ".decode_polyline" do
     Polylines::Decoder.decode_polyline(polyline).should == points
   end
 end
+
+describe Polylines::Decoder, ".decode_polyline with points that were close together" do
+  it "decodes a polyline correctly" do
+    Polylines::Decoder.decode_polyline("krk{FdxdlO?e@").should == [[41.35222, -86.04563],[41.35222, -86.04544]]
+  end
+end

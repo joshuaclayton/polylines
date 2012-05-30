@@ -14,3 +14,9 @@ describe Polylines::Encoder, ".encode_points" do
     Polylines::Encoder.encode_points(points).should == polyline
   end
 end
+
+describe Polylines::Encoder, ".encode_points that are very close together" do
+  it "encodes points correctly" do
+    Polylines::Encoder.encode_points([[41.3522171071184, -86.0456299662023],[41.3522171071183, -86.0454368471533]]).should == "krk{FdxdlO?e@"
+  end
+end
