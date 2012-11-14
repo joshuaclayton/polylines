@@ -93,12 +93,14 @@ module Polylines
       if self == Polylines::Encoder
         delta_latitude, delta_longitude = 0, 0
 
-        return value.inject([]) do |polyline, (latitude, longitude)|
+        e5_values = value.map{|tuple| tuple.map{|val| (val * 1e5).round } }
+        deltas = e5_values.inject([]) do |polyline, (latitude, longitude)|
           polyline << latitude - delta_latitude
           polyline << longitude - delta_longitude
           delta_latitude, delta_longitude = latitude, longitude
           polyline
         end
+        return deltas.map{|val| val.to_f/1e5 }
       end
 
       if self == Polylines::Decoder
