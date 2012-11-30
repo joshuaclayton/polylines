@@ -7,6 +7,7 @@ GEM
   remote: http://rubygems.org/
   specs:
     diff-lcs (1.1.2)
+    rake (10.0.2)
     rspec (2.4.0)
       rspec-core (~> 2.4.0)
       rspec-expectations (~> 2.4.0)
@@ -21,4 +22,5 @@ PLATFORMS
 
 DEPENDENCIES
   polylines!
+  rake
   rspec (= 2.4.0)
