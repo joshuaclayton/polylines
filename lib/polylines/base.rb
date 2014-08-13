@@ -6,11 +6,11 @@ module Polylines
       @current_value = current_value
     end
 
-    def step_2
+    def step_2(precision = 1e5)
       @negative = current_value < 0 if encoding?
 
-      encode! { (current_value * 1e5).round }
-      decode! { current_value.to_f/1e5 }
+      encode! { (current_value * precision).round }
+      decode! { current_value.to_f/precision }
     end
 
     def step_3
@@ -89,18 +89,18 @@ module Polylines
       self.is_a?(Polylines::Decoder)
     end
 
-    def self.transform_to_array_of_lat_lng_and_deltas(value)
+    def self.transform_to_array_of_lat_lng_and_deltas(value, precision = 1e5)
       if self == Polylines::Encoder
         delta_latitude, delta_longitude = 0, 0
 
-        e5_values = value.map{|tuple| tuple.map{|val| (val * 1e5).round } }
-        deltas = e5_values.inject([]) do |polyline, (latitude, longitude)|
+        shifted_values = value.map{|tuple| tuple.map{|val| (val * precision).round } }
+        deltas = shifted_values.inject([]) do |polyline, (latitude, longitude)|
           polyline << latitude - delta_latitude
           polyline << longitude - delta_longitude
           delta_latitude, delta_longitude = latitude, longitude
           polyline
         end
-        return deltas.map{|val| val.to_f/1e5 }
+        return deltas.map{|val| val.to_f/precision }
       end
 
       if self == Polylines::Decoder
@@ -114,7 +114,7 @@ module Polylines
           end
 
           charset
-        end.map {|charset| decode(charset) }
+        end.map {|charset| decode(charset, precision) }
       end
     end
   end
