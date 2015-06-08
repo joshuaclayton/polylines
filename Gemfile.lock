@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    polylines (0.2.0)
+    polylines (0.3.0)
 
 GEM
   remote: http://rubygems.org/
