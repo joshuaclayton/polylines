@@ -1,22 +1,37 @@
 module Polylines
-  class Encoder < Base
+  class Encoder
     def self.encode_points(points, precision = 1e5)
-      points_with_deltas = transform_to_array_of_lat_lng_and_deltas(points, precision)
-      points_with_deltas.map {|point| encode(point, precision) }.join
+      result = ""
+      last_lat = last_lng = 0
+      points.each do |point|
+        lat = (point[0] * precision).round / precision
+        lng = (point[1] * precision).round / precision
+        d_lat = lat - last_lat
+        d_lng = lng - last_lng
+        chunks_lat = encode(d_lat, precision)
+        chunks_lng = encode(d_lng, precision)
+        result << chunks_lat << chunks_lng
+        last_lat = lat
+        last_lng = lng
+      end
+      result
     end
 
-    def self.encode(number, precision = 1e5)
-      self.new(number).tap do |encoding|
-        encoding.step_2 precision
-        encoding.step_3
-        encoding.step_4
-        encoding.step_5
-        encoding.step_6
-        encoding.step_7
-        encoding.step_8
-        encoding.step_10
-        encoding.step_11
-      end.current_value
+    def self.encode(num, precision = 1e5)
+      num = (num * precision).round
+      sgn_num = num << 1
+      sgn_num = ~sgn_num if num < 0
+      encode_number(sgn_num)
     end
+
+    def self.encode_number(num)
+      result = ""
+      while num >= 0x20
+        result << (0x20 | (num & 0x1f)) + 63
+        num = num >> 5
+      end
+      result << num + 63
+    end
+    private_class_method :encode_number
   end
 end
