@@ -1,7 +1,7 @@
 module Polylines
   class Encoder
     def self.encode_points(points, precision = 1e5)
-      result = ""
+      result = ''
       last_lat = last_lng = 0
       points.each do |point|
         lat = (point[0] * precision).round / precision
@@ -25,7 +25,7 @@ module Polylines
     end
 
     def self.encode_number(num)
-      result = ""
+      result = ''
       while num >= 0x20
         result << (0x20 | (num & 0x1f)) + 63
         num = num >> 5

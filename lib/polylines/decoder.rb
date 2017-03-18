@@ -1,33 +1,34 @@
 module Polylines
-  class Decoder < Base
+  class Decoder
     def self.decode_polyline(polyline, precision = 1e5)
-      points_with_deltas = transform_to_array_of_lat_lng_and_deltas(polyline,
-                                                                    precision)
-
-      [].tap do |points|
-        points << [points_with_deltas.shift, points_with_deltas.shift]
-
-        while points_with_deltas.any?
-          points << [
-            points.last[0] + points_with_deltas.shift,
-            points.last[1] + points_with_deltas.shift
-          ]
-        end
+      coords = []
+      acc = ''
+      last_lat = last_lng = 0
+      lat_turn = true
+      polyline.each_char do |c|
+        acc << c
+        next unless c.ord < 0x5f
+        delta = lat_turn ? last_lat : last_lng
+        coord = delta + decode(acc, precision)
+        coords << coord
+        last_lat = coord if lat_turn
+        last_lng = coord unless lat_turn
+        lat_turn = !lat_turn
+        acc = ''
       end
+      coords.each_slice(2).to_a
     end
 
     def self.decode(string, precision = 1e5)
-      self.new(string).tap do |decoding|
-        decoding.step_11
-        decoding.step_10
-        decoding.step_8
-        decoding.step_7
-        decoding.step_6
-        decoding.step_5
-        decoding.step_4
-        decoding.step_3
-        decoding.step_2 precision
-      end.current_value
+      result = 1
+      shift = 0
+      string.each_byte do |b|
+        b = b - 63 - 1
+        result += b << shift
+        shift += 5
+      end
+      result = (result & 1).nonzero? ? (~result >> 1) : (result >> 1)
+      result / precision
     end
   end
 end
