@@ -43,3 +43,11 @@ describe Polylines::Decoder, ".decode_polyline with points that were close toget
     expect(Polylines::Decoder.decode_polyline("q`}zmAzzxbcD?aK", 1e6)).to eq points
   end
 end
+
+describe Polylines::Decoder, ".decode_polyline with a value that previously broke" do
+  it "decodes a polyline correctly" do
+    value = "kbdoH{ioqCoF_j@Lwc@lC{BhNoMzCuJbEm]?wKkBaQmD}EqM_GwFiBfCge@zE_K~SaTdT`L|Da\\\\xJsX|EyJtQgPpXuRjKAtJqBfM[pn@g^nF}G??"
+
+    expect(Polylines::Decoder.decode_polyline(value).length).to eq 27
+  end
+end

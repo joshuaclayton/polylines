@@ -7,7 +7,7 @@ module Polylines
       [].tap do |points|
         points << [points_with_deltas.shift, points_with_deltas.shift]
 
-        while points_with_deltas.any?
+        while points_with_deltas.size > 1
           points << [
             points.last[0] + points_with_deltas.shift,
             points.last[1] + points_with_deltas.shift
