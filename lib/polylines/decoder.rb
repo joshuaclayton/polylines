@@ -9,8 +9,8 @@ module Polylines
 
         while points_with_deltas.size > 1
           points << [
-            points.last[0] + points_with_deltas.shift,
-            points.last[1] + points_with_deltas.shift
+            points.last[0] + (points_with_deltas.shift || 0.0),
+            points.last[1] + (points_with_deltas.shift || 0.0)
           ]
         end
       end
